@@ -1,4 +1,4 @@
-angular.module('resource.solver', [])
+angular.module('resourceSolver', [])
 .provider('resourceSolver', function ResourceSolver() {
   var baseUrl = '';
 
