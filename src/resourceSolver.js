@@ -16,12 +16,12 @@ angular.module('resourceSolver', [])
 })
 .constant('rs', function(res) {
 
-  function Solver($resource, $resourceSolver, $state) {
-    var baseUrl = $resourceSolver.getBaseUrl();
+  function Solver($resource, resourceSolver, $state) {
+    var baseUrl = resourceSolver.getBaseUrl();
     var action = res.action || 'get';
 
     return $resource(baseUrl+res.url, $state.params)[action]().$promise;
   };
 
-  return ['$resource', '$resourceSolver', '$state', Solver];
+  return ['$resource', 'resourceSolver', '$state', Solver];
 });
