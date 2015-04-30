@@ -6,7 +6,13 @@ angular.module('resourceSolver', [])
     baseUrl = url;
   };
 
-  this.$get = function() {
+  this.$get = function($rootScope, $state) {
+
+    $rootScope.$on('$stateChangeStart', function(event, state, params) {
+      $state.next = state;
+      $state.nextParams = params;
+    });
+
     return {
       getBaseUrl: function() {
         return baseUrl;
@@ -20,7 +26,7 @@ angular.module('resourceSolver', [])
     var baseUrl = resourceSolver.getBaseUrl();
     var action = res.action || 'get';
 
-    return $resource(baseUrl+res.url, $state.params)[action]().$promise;
+    return $resource(baseUrl+res.url, $state.nextParams)[action]().$promise;
   };
 
   return ['$resource', 'resourceSolver', '$state', Solver];
