@@ -6,12 +6,7 @@ angular.module('resourceSolver', [])
     baseUrl = url;
   };
 
-  this.$get = function($rootScope, $state) {
-
-    $rootScope.$on('$stateChangeStart', function(event, state, params) {
-      $state.next = state;
-      $state.nextParams = params;
-    });
+  this.$get = function() {
 
     return {
       getBaseUrl: function() {
@@ -19,6 +14,12 @@ angular.module('resourceSolver', [])
       }
     };
   };
+}).run(function($rootScope, $state) {
+
+  $rootScope.$on('$stateChangeStart', function(event, state, params) {
+    $state.next = state;
+    $state.nextParams = params;
+  });
 })
 .constant('rs', function(res) {
 
