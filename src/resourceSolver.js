@@ -1,4 +1,4 @@
-angular.module('resourceSolver', [])
+angular.module('resourceSolver', ['ui.router'])
 .provider('resourceSolver', function ResourceSolver() {
   var baseUrl = '';
 
@@ -14,13 +14,17 @@ angular.module('resourceSolver', [])
       }
     };
   };
-}).run(function($rootScope, $state) {
+}).config(['$provide', function($provide) {
 
-  $rootScope.$on('$stateChangeStart', function(event, state, params) {
-    $state.next = state;
-    $state.nextParams = params;
+  $provide.decorator("$state", function($delegate, $rootScope) {
+    $rootScope.$on('$stateChangeStart', function(event, toState, toParams) {
+      $delegate.next = toState;
+      $delegate.nextParams = toParams;
+    });
+    return $delegate;
   });
-})
+
+}])
 .constant('rs', function(res) {
 
   function Solver($resource, resourceSolver, $state) {
