@@ -21,6 +21,43 @@ angular.module('resourceSolver', ['ui.router'])
       $delegate.next = toState;
       $delegate.nextParams = toParams;
     });
+
+    function searchState(state, scope) {
+      for(var i in state.locals) {
+        if(state.locals.hasOwnProperty(i) && i.indexOf('@') > -1 && state.locals[i].$scope === scope) {
+          console.log("Matched scope", i, state.self.name, state, scope);
+          return state;
+        }
+      }
+      if(state.parent) {
+        return searchState(state.parent, scope);
+      } else {
+        return null;
+      }
+    }
+
+    $rootScope.$on('$viewContentLoaded', function(event) {
+
+      var state = searchState($delegate.$current, event.targetScope);
+      if(state) {
+        var data = {}; 
+        var foundData = false;
+        for(var i in state.locals.globals) {
+          if(i.indexOf('$') != 0) {
+            foundData = true;
+            data[i] = state.locals.globals[i];
+          }
+        }
+        if(foundData) {
+          //event.targetScope.$apply(function() {
+          console.log("Autoinject into scope", data);
+          angular.extend(event.targetScope, data);
+          //});
+        }
+      }
+
+    });
+
     return $delegate;
   });
 
