@@ -51,7 +51,7 @@ angular.module('resourceSolver', ['ui.router'])
     function searchState(state, scope) {
       for(var i in state.locals) {
         if(state.locals.hasOwnProperty(i) && i.indexOf('@') > -1 && state.locals[i].$scope === scope) {
-          console.log("Matched scope", i, state.self.name, state, scope);
+          console.log("Matched scope", i, state.self.name);
           return state;
         }
       }
