@@ -1,5 +1,31 @@
+function ResourceSolver(res) {
+
+  function Solver($resource, resourceSolver, $state) {
+    var baseUrl = resourceSolver.getBaseUrl();
+    var action = res.action || 'get';
+
+    return $resource(baseUrl+res.url, $state.nextParams)[action]().$promise;
+  };
+
+  var injectable = ['$resource', 'resourceSolver', '$state', Solver];
+
+  injectable.fetch = function() {
+    var $injector = ResourceSolver.prototype.$injector;
+    if(!$injector) {
+      console.error("Should not call rs.fetch before the configuration phase is over");
+    } else {
+      return $injector.invoke(injectable);
+    }
+  };
+
+  return injectable;
+}
+
 angular.module('resourceSolver', ['ui.router'])
-.provider('resourceSolver', function ResourceSolver() {
+
+.constant('rs', ResourceSolver)
+
+.provider('resourceSolver', function ResourceSolverProvider() {
   var baseUrl = '';
 
   this.setBaseUrl = function(url) {
@@ -60,16 +86,10 @@ angular.module('resourceSolver', ['ui.router'])
 
     return $delegate;
   });
-
 }])
-.constant('rs', function(res) {
+.run(['$injector', function($injector) {
 
-  function Solver($resource, resourceSolver, $state) {
-    var baseUrl = resourceSolver.getBaseUrl();
-    var action = res.action || 'get';
+  //Decorate rs constant for runtime auto-injection.
+  ResourceSolver.prototype.$injector = $injector;
 
-    return $resource(baseUrl+res.url, $state.nextParams)[action]().$promise;
-  };
-
-  return ['$resource', 'resourceSolver', '$state', Solver];
-});
+}]);
