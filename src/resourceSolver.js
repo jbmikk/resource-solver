@@ -69,7 +69,7 @@ angular.module('resourceSolver', ['ui.router'])
         var data = {}; 
         var foundData = false;
         for(var i in state.locals.globals) {
-          if(i.indexOf('$') != 0) {
+          if(state.resolve && state.resolve.hasOwnProperty(i) && i.indexOf('$') != 0) {
             foundData = true;
             data[i] = state.locals.globals[i];
           }
