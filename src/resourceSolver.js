@@ -4,7 +4,9 @@ function ResourceSolver(res) {
     var baseUrl = resourceSolver.getBaseUrl();
     var action = res.action || 'get';
 
-    return $resource(baseUrl+res.url, $state.nextParams)[action]().$promise;
+    var params = angular.extend({}, $state.nextParams, res.params || {});
+
+    return $resource(baseUrl+res.url, params)[action]().$promise;
   };
 
   var injectable = ['$resource', 'resourceSolver', '$state', Solver];
