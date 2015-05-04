@@ -159,6 +159,48 @@ angular.module('resourceSolver', ['ui.router'])
     }
   };
 }])
+.directive('rsOnSuccess', ['$parse', function($parse) {
+  return {
+    require: 'rsOnSuccess',
+    link: function(scope, elem, attrs, controller) {
+      controller.setAttributes(attrs);
+    },
+    controller: function() {
+      var _attrs;
+
+      this.setAttributes = function(attrs) {
+        _attrs = attrs;
+      };
+
+      this.success = function(data) {
+        $parse(_attrs.rsOnSuccess)(scope, {
+          value: data
+        });
+      };
+    }
+  };
+}])
+.directive('rsOnError', ['$parse', function($parse) {
+  return {
+    require: 'rsOnError',
+    link: function(scope, elem, attrs, controller) {
+      controller.setAttributes(attrs);
+    },
+    controller: function() {
+      var _attrs;
+
+      this.setAttributes = function(attrs) {
+        _attrs = attrs;
+      };
+
+      this.error = function(error) {
+        $parse(_attrs.rsOnSuccess)(scope, {
+          error: error
+        });
+      };
+    }
+  };
+}])
 .directive('rsThen', ['$compile', function($compile) {
   return {
     restrict: 'A',
@@ -184,24 +226,32 @@ angular.module('resourceSolver', ['ui.router'])
 }])
 .directive('rsSubmit', function() {
   return {
-    require: ['^form', '^rsUrl', '?rsThen'],
+    require: ['^form', '^rsUrl', '?rsThen', '?rsOnSuccess', '?rsOnError'],
     link: function(scope, elem, attrs, controllers) {
       var form = controllers[0];
       var resource = controllers[1];
       var rsThen = controllers[2];
+      var rsOnSuccess = controllers[3];
+      var rsOnError = controllers[4];
 
       elem.on('click', function() {
         scope.$apply(function() {
           form.$setSubmitted(true);
         });
         if(form.$valid) {
-          resource.submit().then(function() {
+          resource.submit().then(function(data) {
             scope.$emit('formSuccess', form);
             if(rsThen) {
               rsThen.success();
             }
+            if(rsOnSuccess) {
+              rsOnSuccess.success(data);
+            }
           }, function(error) {
             //TODO: add errors to form?
+            if(rsOnError) {
+              rsOnError.error(error);
+            }
             console.error("Could not submit form", error);
           });
         }
