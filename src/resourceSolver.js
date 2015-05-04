@@ -102,4 +102,110 @@ angular.module('resourceSolver', ['ui.router'])
   //Decorate rs constant for runtime auto-injection.
   ResourceSolver.prototype.$injector = $injector;
 
-}]);
+}])
+.directive('rsUrl', ['$parse', 'rs', function($parse, rs) {
+  return {
+    restrict: 'A',
+    require: 'rsUrl',
+    link: function(scope, elem, attrs, controller) {
+      controller.setAttributes(attrs);
+    },
+    controller: ['$scope', function($scope) {
+      var _attrs;
+
+      this.setAttributes = function(attrs) {
+        _attrs = attrs;
+      };
+
+      this.submit = function() {
+        var params, data;
+
+        if(_attrs.rsParams) {
+          params = $parse(_attrs.rsParams)($scope);
+        } else {
+          params = {};
+        }
+
+        if(_attrs.ngModel) {
+          data = $parse(_attrs.ngModel)($scope);
+        }
+        return rs({
+          url: _attrs.rsUrl,
+          params: params,
+          action: _attrs.rsAction || 'post',
+          data: data
+        }).fetch();
+      };
+    }]
+  };
+}])
+.directive('rsNotifySuccess', ['$rootScope', '$timeout', function($rootScope, $timeout) {
+  return {
+    scope: {
+      'rsNotifySuccess': '='
+    },
+    link: function(scope, elem, attrs, controllers) {
+      elem.hide();
+      var formSuccess = $rootScope.$on('formSuccess', function(event, form) {
+        if(form === scope.rsNotifySuccess) {
+          elem.slideDown();
+          $timeout(function() {
+            elem.slideUp();
+          }, 5000);
+        }
+      });
+
+      scope.$on('$destroy', formSuccess);
+    }
+  };
+}])
+.directive('rsThen', ['$compile', function($compile) {
+  return {
+    restrict: 'A',
+    require: 'rsThen',
+    link: function(scope, elem, attrs, controller) {
+      var proxyElem = $compile('<a style="display:none" ui-sref="'+attrs.rsThen+'" ui-sref-opts="{reload: true}"></a>')(scope);
+      proxyElem.insertAfter(elem);
+
+      controller.setProxy(proxyElem);
+    },
+    controller: function() {
+      var proxyElem;
+
+      this.setProxy = function(elem) {
+        proxyElem = elem;
+      };
+
+      this.success = function() {
+        proxyElem.trigger('click');
+      };
+    }
+  };
+}])
+.directive('rsSubmit', function() {
+  return {
+    require: ['^form', '^rsUrl', '?rsThen'],
+    link: function(scope, elem, attrs, controllers) {
+      var form = controllers[0];
+      var resource = controllers[1];
+      var rsThen = controllers[2];
+
+      elem.on('click', function() {
+        scope.$apply(function() {
+          form.$setSubmitted(true);
+        });
+        if(form.$valid) {
+          resource.submit().then(function() {
+            scope.$emit('formSuccess', form);
+            if(rsThen) {
+              rsThen.success();
+            }
+          }, function(error) {
+            //TODO: add errors to form?
+            console.error("Could not submit form", error);
+          });
+        }
+      });
+    }
+  };
+});
