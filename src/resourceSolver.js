@@ -6,7 +6,15 @@ function ResourceSolver(res) {
 
     var params = angular.extend({}, $state.nextParams, res.params || {});
 
-    return $resource(baseUrl+res.url, params)[action]().$promise;
+    var resource = $resource(baseUrl+res.url, params, {
+      'update': {method: 'PUT'}
+    });
+
+    if(res.data) {
+      return resource[action](res.data).$promise;
+    } else {
+      return resource[action]().$promise;
+    }
   };
 
   var injectable = ['$resource', 'resourceSolver', '$state', Solver];
