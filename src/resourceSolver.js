@@ -37,9 +37,14 @@ angular.module('resourceSolver', ['ui.router'])
 
 .provider('resourceSolver', function ResourceSolverProvider() {
   var baseUrl = '';
+  var _headers = {};
 
   this.setBaseUrl = function(url) {
     baseUrl = url;
+  };
+
+  this.setHeaders = function(headers) {
+    _headers = headers;
   };
 
   this.$get = function() {
@@ -47,10 +52,24 @@ angular.module('resourceSolver', ['ui.router'])
     return {
       getBaseUrl: function() {
         return baseUrl;
+      },
+      getHeaders: function() {
+        return _headers;
       }
     };
   };
-}).config(['$provide', function($provide) {
+})
+.factory('authorizationInterceptor', ['resourceSolver', function (resourceSolver) {
+  return {
+    request: function (config) {
+      angular.extend(config.headers, resourceSolver.getHeaders());
+      return config;
+    }
+  };
+}])
+.config(['$provide', '$httpProvider', function($provide, $httpProvider) {
+
+  $httpProvider.interceptors.push('authorizationInterceptor');
 
   $provide.decorator("$state", function($delegate, $rootScope) {
     $rootScope.$on('$stateChangeStart', function(event, toState, toParams) {
