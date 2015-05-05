@@ -55,6 +55,9 @@ angular.module('resourceSolver', ['ui.router'])
       },
       getHeaders: function() {
         return _headers;
+      },
+      setHeaders: function(headers) {
+        _headers = headers;
       }
     };
   };
