@@ -4,7 +4,8 @@ function ResourceSolver(res) {
     var baseUrl = resourceSolver.getBaseUrl();
     var action = res.action || 'get';
 
-    var params = angular.extend({}, $state.nextParams, res.params || {});
+    var stateParams = $state.nextParams? $state.nextParams: $state.params;
+    var params = angular.extend({}, stateParams, res.params || {});
 
     var resource = $resource(baseUrl+res.url, params, {
       'update': {method: 'PUT'}
@@ -79,6 +80,15 @@ angular.module('resourceSolver', ['ui.router'])
       $delegate.next = toState;
       $delegate.nextParams = toParams;
     });
+    $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams) {
+      $delegate.next = null;
+      $delegate.nextParams = null;
+    });
+    $rootScope.$on('$stateChangeError', function(event, toState, toParams) {
+      $delegate.next = null;
+      $delegate.nextParams = null;
+    });
+
 
     function searchState(state, scope) {
       for(var i in state.locals) {
