@@ -8,7 +8,9 @@ function ResourceSolver(res) {
     var params = angular.extend({}, stateParams, res.params || {});
 
     var resource = $resource(baseUrl+res.url, params, {
-      'update': {method: 'PUT'}
+      'update': {method: 'PUT'},
+      'bulkUpdate': {method: 'PUT', isArray: true},
+      'bulkSave': {method: 'POST', isArray: true}
     });
 
     if(res.data) {
