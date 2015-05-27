@@ -242,19 +242,23 @@ angular.module('resourceSolver', ['ui.router'])
     restrict: 'A',
     require: 'rsThen',
     link: function(scope, elem, attrs, controller) {
-      var proxyElem = $compile('<a style="display:none" ui-sref="'+attrs.rsThen+'" ui-sref-opts="{reload: true}"></a>')(scope);
+      var proxyScope = scope.$new();
+      var proxyElem = $compile('<a style="display:none" ui-sref="'+attrs.rsThen+'" ui-sref-opts="{reload: true}"></a>')(proxyScope);
       proxyElem.insertAfter(elem);
 
-      controller.setProxy(proxyElem);
+      controller.setProxy(proxyElem, proxyScope);
     },
     controller: function() {
       var proxyElem;
+      var proxyScope;
 
-      this.setProxy = function(elem) {
+      this.setProxy = function(elem, scope) {
         proxyElem = elem;
+        proxyScope = scope;
       };
 
-      this.success = function() {
+      this.success = function(data) {
+        proxyScope.$value = data;
         proxyElem.trigger('click');
       };
     }
@@ -278,7 +282,7 @@ angular.module('resourceSolver', ['ui.router'])
           resource.submit().then(function(data) {
             scope.$emit('formSuccess', form);
             if(rsThen) {
-              rsThen.success();
+              rsThen.success(data);
             }
             if(rsOnSuccess) {
               rsOnSuccess.success(data);
