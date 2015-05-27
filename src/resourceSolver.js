@@ -197,18 +197,19 @@ angular.module('resourceSolver', ['ui.router'])
   return {
     require: 'rsOnSuccess',
     link: function(scope, elem, attrs, controller) {
-      controller.setAttributes(attrs);
+      controller.setContext(scope, attrs);
     },
     controller: function() {
-      var _attrs;
+      var _attrs, _scope;
 
-      this.setAttributes = function(attrs) {
+      this.setContext = function(scope, attrs) {
+        _scope = scope;
         _attrs = attrs;
       };
 
       this.success = function(data) {
-        $parse(_attrs.rsOnSuccess)(scope, {
-          value: data
+        $parse(_attrs.rsOnSuccess)(_scope, {
+          $value: data
         });
       };
     }
@@ -218,18 +219,19 @@ angular.module('resourceSolver', ['ui.router'])
   return {
     require: 'rsOnError',
     link: function(scope, elem, attrs, controller) {
-      controller.setAttributes(attrs);
+      controller.setContext(scope, attrs);
     },
     controller: function() {
-      var _attrs;
+      var _attrs, _scope;
 
-      this.setAttributes = function(attrs) {
+      this.setContext = function(scope, attrs) {
+        _scope = scope;
         _attrs = attrs;
       };
 
       this.error = function(error) {
-        $parse(_attrs.rsOnSuccess)(scope, {
-          error: error
+        $parse(_attrs.rsOnError)(_scope, {
+          $error: error
         });
       };
     }
