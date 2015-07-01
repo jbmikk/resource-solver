@@ -268,7 +268,7 @@ angular.module('resourceSolver', ['ui.router'])
 }])
 .directive('rsSubmit', function() {
   return {
-    require: ['^form', '^rsUrl', '?rsThen', '?rsOnSuccess', '?rsOnError'],
+    require: ['^?form', '^rsUrl', '?rsThen', '?rsOnSuccess', '?rsOnError'],
     link: function(scope, elem, attrs, controllers) {
       var form = controllers[0];
       var resource = controllers[1];
@@ -278,11 +278,15 @@ angular.module('resourceSolver', ['ui.router'])
 
       elem.on('click', function() {
         scope.$apply(function() {
-          form.$setSubmitted(true);
+          if(form) {
+            form.$setSubmitted(true);
+          }
         });
-        if(form.$valid) {
+        if(!form || (form && form.$valid)) {
           resource.submit().then(function(data) {
-            scope.$emit('formSuccess', form);
+            if(form) {
+              scope.$emit('formSuccess', form);
+            }
             if(rsThen) {
               rsThen.success(data);
             }
