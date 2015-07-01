@@ -162,6 +162,8 @@ angular.module('resourceSolver', ['ui.router'])
 
         if(_attrs.ngModel) {
           data = $parse(_attrs.ngModel)($scope);
+        } else if(_attrs.rsData) {
+          data = $parse(_attrs.rsData)($scope);
         }
         return rs({
           url: _attrs.rsUrl,
