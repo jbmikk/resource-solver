@@ -137,7 +137,7 @@ angular.module('resourceSolver', ['ui.router'])
   ResourceSolver.prototype.$injector = $injector;
 
 }])
-.directive('rsUrl', ['$parse', 'rs', function($parse, rs) {
+.directive('rsUrl', ['$parse', '$q', 'rs', function($parse, $q, rs) {
   return {
     restrict: 'A',
     require: 'rsUrl',
@@ -151,6 +151,15 @@ angular.module('resourceSolver', ['ui.router'])
         _attrs = attrs;
       };
 
+      function sendRequest(params, data) {
+        return rs({
+          url: _attrs.rsUrl,
+          params: params,
+          action: _attrs.rsAction || 'post',
+          data: data
+        }).fetch();
+      }
+
       this.submit = function() {
         var params, data;
 
@@ -162,15 +171,32 @@ angular.module('resourceSolver', ['ui.router'])
 
         if(_attrs.ngModel) {
           data = $parse(_attrs.ngModel)($scope);
+          return sendRequest(params, data);
         } else if(_attrs.rsData) {
           data = $parse(_attrs.rsData)($scope);
+          return sendRequest(params, data);
+        } else if(_attrs.rsBatch) {
+          data = $parse(_attrs.rsBatch)($scope);
+
+          var batchParams = {};
+          if(_attrs.rsBatchParams) {
+            batchParams = $parse(_attrs.rsBatchParams)($scope);
+          }
+          var promises = [];
+          data.forEach(function(obj) {
+            var p = angular.extend({}, params);
+            //Extend params with listed properties from object
+            for (var i in batchParams) {
+              p[i] = obj[batchParams[i]];
+            }
+            var mappedObject = obj;
+            if(_attrs.rsMap) {
+              mappedObject = $parse(_attrs.rsMap)($scope, obj);
+            }
+            promises.push(sendRequest(p, mappedObject));
+          });
+          return $q.all(promises);
         }
-        return rs({
-          url: _attrs.rsUrl,
-          params: params,
-          action: _attrs.rsAction || 'post',
-          data: data
-        }).fetch();
       };
     }]
   };
