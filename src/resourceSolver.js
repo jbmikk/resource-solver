@@ -201,26 +201,6 @@ angular.module('resourceSolver', ['ui.router'])
     }]
   };
 }])
-.directive('rsNotifySuccess', ['$rootScope', '$timeout', function($rootScope, $timeout) {
-  return {
-    scope: {
-      'rsNotifySuccess': '='
-    },
-    link: function(scope, elem, attrs, controllers) {
-      elem.hide();
-      var formSuccess = $rootScope.$on('formSuccess', function(event, form) {
-        if(form === scope.rsNotifySuccess) {
-          elem.slideDown();
-          $timeout(function() {
-            elem.slideUp();
-          }, 5000);
-        }
-      });
-
-      scope.$on('$destroy', formSuccess);
-    }
-  };
-}])
 .directive('rsOnSuccess', ['$parse', function($parse) {
   return {
     require: 'rsOnSuccess',
@@ -310,9 +290,10 @@ angular.module('resourceSolver', ['ui.router'])
         });
         if(!form || (form && form.$valid)) {
           resource.submit().then(function(data) {
-            if(form) {
-              scope.$emit('formSuccess', form);
-            }
+            scope.$emit('rsSuccess', {
+              form: form,
+              data: data
+            });
             if(rsThen) {
               rsThen.success(data);
             }
@@ -321,6 +302,10 @@ angular.module('resourceSolver', ['ui.router'])
             }
           }, function(error) {
             //TODO: add errors to form?
+            scope.$emit('rsError', {
+              form: form,
+              error: error
+            });
             if(rsOnError) {
               rsOnError.error(error);
             }
