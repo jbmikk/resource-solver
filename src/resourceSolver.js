@@ -279,7 +279,7 @@ angular.module('resourceSolver', ['ui.router'])
     }
   };
 }])
-.directive('rsSubmit', function() {
+.directive('rsSubmit', function($state) {
   return {
     require: ['^?form', '^rsUrl', '?rsThen', '?rsOnSuccess', '?rsOnError'],
     link: function(scope, elem, attrs, controllers) {
@@ -306,6 +306,9 @@ angular.module('resourceSolver', ['ui.router'])
             }
             if(rsOnSuccess) {
               rsOnSuccess.success(data);
+            }
+            if('rsThenReload' in attrs) {
+              $state.reload();
             }
           }, function(error) {
             //TODO: add errors to form?
