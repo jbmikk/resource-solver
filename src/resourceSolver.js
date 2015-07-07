@@ -146,17 +146,26 @@ angular.module('resourceSolver', ['ui.router'])
     },
     controller: ['$scope', function($scope) {
       var _attrs;
+      var mapper;
 
       this.setAttributes = function(attrs) {
         _attrs = attrs;
+
+        if(_attrs.rsMap) {
+          mapper = $parse(_attrs.rsMap);
+        }
       };
 
       function sendRequest(params, data) {
+        var mappedData = data;
+        if(mapper) {
+          mappedData = mapper($scope, data);
+        }
         return rs({
           url: _attrs.rsUrl,
           params: params,
           action: _attrs.rsAction || 'post',
-          data: data
+          data: mappedData 
         }).fetch();
       }
 
@@ -189,11 +198,7 @@ angular.module('resourceSolver', ['ui.router'])
             for (var i in batchParams) {
               p[i] = obj[batchParams[i]];
             }
-            var mappedObject = obj;
-            if(_attrs.rsMap) {
-              mappedObject = $parse(_attrs.rsMap)($scope, obj);
-            }
-            promises.push(sendRequest(p, mappedObject));
+            promises.push(sendRequest(p, obj));
           });
           return $q.all(promises);
         }
