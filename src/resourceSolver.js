@@ -201,6 +201,8 @@ angular.module('resourceSolver', ['ui.router'])
             promises.push(sendRequest(p, obj));
           });
           return $q.all(promises);
+        } else {
+          console.error("No ngModel or data defined");
         }
       };
     }]
