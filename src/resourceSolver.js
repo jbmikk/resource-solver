@@ -146,7 +146,7 @@ angular.module('resourceSolver', ['ui.router'])
     },
     controller: ['$scope', function($scope) {
       var _attrs;
-      var mapper;
+      var mapper, merger;
 
       this.setAttributes = function(attrs) {
         _attrs = attrs;
@@ -154,18 +154,23 @@ angular.module('resourceSolver', ['ui.router'])
         if(_attrs.rsMap) {
           mapper = $parse(_attrs.rsMap);
         }
+        if(_attrs.rsMerge) {
+          merger = $parse(_attrs.rsMerge);
+        }
       };
 
       function sendRequest(params, data) {
-        var mappedData = data;
         if(mapper) {
-          mappedData = mapper($scope, data);
+          data = mapper($scope, data);
+        }
+        if(merger) {
+          data = angular.extend(data, merger($scope));
         }
         return rs({
           url: _attrs.rsUrl,
           params: params,
           action: _attrs.rsAction || 'post',
-          data: mappedData 
+          data: data
         }).fetch();
       }
 
