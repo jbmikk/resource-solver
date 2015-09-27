@@ -1,0 +1,23 @@
+{
+  "name": "resource-solver",
+  "version": "0.0.0",
+  "homepage": "https://github.com/jbmikk/resource-solver",
+  "authors": [
+    "Jens Mikkelsen <jbmikk@gmail.com>"
+  ],
+  "main": "src/resource-solver.js",
+  "moduleType": [
+    "amd"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.4.6"
+  }
+}
