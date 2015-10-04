@@ -1,9 +1,14 @@
 describe( 'resource-solver', function() {
 
-  beforeEach(module('ngResource'));
   beforeEach(module('resourceSolver'));
 
   it( 'fetch basic resource should return data', function() {
+
+    module('ngResource', function($resourceProvider) {
+      $resourceProvider.setData({
+        test: 'value'
+      });
+    });
 
     inject(function(rs) {
 
@@ -24,6 +29,7 @@ describe( 'resource-solver', function() {
         data = _data;
       });
       expect(data).not.toBeUndefined();
+      expect(data.test).toBe('value');
     });
 
   });

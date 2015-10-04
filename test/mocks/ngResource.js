@@ -3,11 +3,11 @@ angular.module('ngResource', [])
 .provider('$resource', function() {
 
   function action() {
-    var data = {};
+    var data = _data || {};
 
     data.$promise = {
       then: function(callback) {
-        return callback({});
+        return callback(data);
       }
     };
 
@@ -20,5 +20,10 @@ angular.module('ngResource', [])
         get: action
       }
     };
+  };
+
+  var _data;
+  this.setData = function(data) {
+    _data = data;
   };
 });
