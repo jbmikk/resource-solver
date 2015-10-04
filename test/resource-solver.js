@@ -34,4 +34,26 @@ describe( 'resource-solver', function() {
 
   });
 
+  it( 'submit rsUrl without data should log error', function() {
+
+    inject(function($rootScope, $compile, $http) {
+
+      var elem = angular.element('<form rs-url="test"></form>');
+      $compile(elem)($rootScope);
+
+      var controller = elem.controller('rsUrl');
+      expect(controller).not.toBeUndefined();
+
+      var message;
+      var spyCall = spyOn(console, 'error').and.callFake(function(m) {
+        message = m;
+        spyCall.and.callThrough();
+      });
+      var promise = controller.submit();
+
+      expect(promise).toBeUndefined();
+      expect(message).toBe("No ngModel or data defined");
+
+    });
+  });
 });
