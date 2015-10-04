@@ -1,11 +1,29 @@
 describe( 'resource-solver', function() {
 
+  beforeEach(module('ngResource'));
   beforeEach(module('resourceSolver'));
 
-  it( 'resource solver', function() {
+  it( 'fetch basic resource should return data', function() {
 
     inject(function(rs) {
-      expect(true).toBe(true);
+
+      //Define resource
+      var resource = rs({
+        url: 'test'
+      });
+      expect(rs).not.toBeUndefined();
+
+      //Fetch resource
+      var promise = resource.fetch();
+      expect(promise).not.toBeUndefined();
+      expect(promise.then).not.toBeUndefined();
+
+      //Wait data
+      var data;
+      promise.then(function(_data) {
+        data = _data;
+      });
+      expect(data).not.toBeUndefined();
     });
 
   });

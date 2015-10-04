@@ -15,6 +15,7 @@ module.exports = function(grunt) {
           'bower_components/angular/angular.js',
           'bower_components/angular-mocks/angular-mocks.js',
           'test/mocks/uiRouter.js',
+          'test/mocks/ngResource.js',
           'src/**/*.js',
           'test/resource-solver.js'
         ],
