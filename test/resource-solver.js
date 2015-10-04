@@ -1,8 +1,12 @@
 describe( 'resource-solver', function() {
 
+  beforeEach(module('resourceSolver'));
+
   it( 'resource solver', function() {
 
-    expect(true).toBe(true);
+    inject(function(rs) {
+      expect(true).toBe(true);
+    });
 
   });
 
