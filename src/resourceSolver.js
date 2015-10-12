@@ -1,13 +1,22 @@
 function ResourceSolver(res) {
 
   function Solver($resource, resourceSolver, $state) {
-    var baseUrl = resourceSolver.getBaseUrl();
+    var url = resourceSolver.getBaseUrl()+res.url;
     var action = res.action || 'get';
 
+    var urlParams = url.match(/:\w+/g);
     var stateParams = $state.nextParams? $state.nextParams: $state.params;
-    var params = angular.extend({}, stateParams, res.params || {});
+    var defaultParams = {};
+    for (var i = 0; i < urlParams.length; i++) {
+      var paramName = urlParams[i].substr(1);
+      if(paramName in stateParams) {
+        defaultParams[paramName] = stateParams[paramName];
+      }
+    }
 
-    var resource = $resource(baseUrl+res.url, params, {
+    var params = angular.extend({}, defaultParams, res.params || {});
+
+    var resource = $resource(url, params, {
       'update': {method: 'PUT'},
       'bulkUpdate': {method: 'PUT', isArray: true},
       'bulkSave': {method: 'POST', isArray: true}
