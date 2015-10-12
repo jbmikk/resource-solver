@@ -84,7 +84,7 @@ angular.module('resourceSolver', ['ui.router'])
     }
   };
 }])
-.config(['$provide', '$httpProvider', function($provide, $httpProvider) {
+.config(['$provide', '$httpProvider', function($provide, $httpProvider, $stateProvider) {
 
   $httpProvider.interceptors.push('authorizationInterceptor');
 
@@ -100,6 +100,23 @@ angular.module('resourceSolver', ['ui.router'])
     $rootScope.$on('$stateChangeError', function(event, toState, toParams) {
       $delegate.next = null;
       $delegate.nextParams = null;
+    });
+
+
+    //Force controllers on all views to force scope creation
+    var dummyController = function(){};
+
+    $stateProvider.decorator('views', function (state, parent) {
+      var result = {},
+      views = parent(state);
+
+      angular.forEach(views, function (config, name) {
+        if(!config.controller) {
+          config.controller = dummyController; 
+        }
+        result[name] = config;
+      });
+      return result;
     });
 
 
