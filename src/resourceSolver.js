@@ -7,10 +7,12 @@ function ResourceSolver(res) {
     var urlParams = url.match(/:\w+/g);
     var stateParams = $state.nextParams? $state.nextParams: $state.params;
     var defaultParams = {};
-    for (var i = 0; i < urlParams.length; i++) {
-      var paramName = urlParams[i].substr(1);
-      if(paramName in stateParams) {
-        defaultParams[paramName] = stateParams[paramName];
+    if(urlParams) {
+      for (var i = 0; i < urlParams.length; i++) {
+        var paramName = urlParams[i].substr(1);
+        if(paramName in stateParams) {
+          defaultParams[paramName] = stateParams[paramName];
+        }
       }
     }
 
